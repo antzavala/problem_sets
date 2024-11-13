@@ -27,6 +27,7 @@ Below is the specific result you will attempt to reproduce (quoted directly from
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
 options(stringsAsFactors = FALSE)
+install.packages("lsr")
 ```
 
 # Step 1: Load packages
@@ -59,7 +60,7 @@ d = d %>%
   mutate(
     DIRECTION = as.factor(DIRECTION),
     STN_NUMBER = as.factor(STN_NUMBER),
-    STN_NAME = factor(STN_NAME, levels = c("SPAD", "STG", "B-Y", "SHER"))
+    STN_NAME = factor(STN_NAME, levels = c("STN", "STG", "B-Y", "SHER"))
   )
 ```
 
@@ -72,9 +73,9 @@ d = d %>%
 ### First, check the number of observations for each condition
 ```{r}
 d %>%
-  group_by("FIXME") %>%
+  group_by("Direction") %>%
   summarize(
-    num_obs = "FIXME",
+    num_obs = "East",
     .groups = "keep"
   ) %>%
   ungroup()
@@ -90,7 +91,7 @@ Note on statistics: the goal of this assignment is for you to get used to reprod
 Now fill in the aov command with the proper variables (e.g. replace "VAR1" with the first variable of interest. This is a two-way ANOVA that tests for a main effect of direction (east vs west), a main effect of station, and an interaction between direction and station. The interaction term is denoted by the * below. For more information, do a little Googling about two-way ANOVAs.
 ```{r test1}
 mod <- aov(data = d,
-           formula = DISTANCE ~ "VAR1" + "VAR2" + "VAR1"*"VAR2")
+           formula = DISTANCE ~ DIRECTION + DISTANCE + STN_NUMBER*STN_NAME)
 anova(mod)
 ```
 
@@ -105,7 +106,7 @@ Note from instructors: We're unclear as to why the F-values are slightly differe
 ### Effect size
 Get the partial eta-squared (under the `eta.sq.part` column). Do your results match the original paper? Hint: they should!
 ```{r}
-etaSquared("FIXME")
+etaSquared(mod)
 ```
 ### Station-specific analyses
 
@@ -115,14 +116,15 @@ etaSquared("FIXME")
 ```{r st-george}
 
 # STEP 1: filter the data to get only St. George estimates
-st.george = d %>%
-  "FIXME"
+st.george = d %>% 
+  filter == "st.george"
 
 # STEP 2: was the estimated distance to St. George greater for eastbound or westbound travellers?
 # no stats needed, just get the mean estimated distance between east and west directions
 # Hint: you'll want group_by() and summarize()
 st.george %>% 
-  "FIXME"
+  group_by(DIRECTION) %>%
+  summarise(mean_distance = mean(DISTANCE, na.rm = TRUE))
 
 # STEP 3: Now run an aov on St. George data with distance as the response variable and direction as the explanatory variable
 st.george.aov = aov(data = st.george, formula = "FIXME")
